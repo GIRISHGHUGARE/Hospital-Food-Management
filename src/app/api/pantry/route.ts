@@ -52,10 +52,10 @@ export async function POST(req: Request) {
 // PUT: Update an existing patient
 export async function PUT(req: Request) {
     const {
+        id,
         staffName,
         contactInfo,
         location,
-        id,
     } = await req.json();  // Parse the incoming JSON request body
 
     // Validate required fields
@@ -106,7 +106,7 @@ export async function DELETE(req: Request) {
         }
 
         // Delete the pantry
-        await pantry.remove();
+        await Pantry.findByIdAndDelete(id);
 
         return NextResponse.json({ message: 'pantry deleted successfully' }, { status: 200 });
     } catch (error) {
