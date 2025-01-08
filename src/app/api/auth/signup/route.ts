@@ -1,14 +1,14 @@
 // src/app/api/auth.ts
 import { NextResponse } from 'next/server';
-import User from '../../../models/User'; // Assuming the User model is in the models folder
+import User from '../../../../models/User';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import connectDb from '../../../config/db';
+import connectDb from '../../../../config/db';
 
 export async function POST(req: Request) {
     await connectDb();
 
-    const { email, password, role } = await req.json(); // `req.json()` is used to parse JSON in Next.js 13 API routes
+    const { email, password, role } = await req.json();
 
     // Validate required fields
     if (!email || !password || !role) {
@@ -35,7 +35,6 @@ export async function POST(req: Request) {
         role
     });
 
-    // Save user to DB
     await newUser.save();
 
     // Generate JWT token for the new user
@@ -44,8 +43,6 @@ export async function POST(req: Request) {
         process.env.JWT_SECRET as string,
         { expiresIn: '1d' } // Token expires in 1 day
     );
-
-    // Send the token and user information back
     return NextResponse.json(
         {
             message: 'User created successfully!',
