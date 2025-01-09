@@ -1,14 +1,20 @@
 "use client";
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from "react-redux";
+import { selectToken, selectUser, login, setError, setLoading } from "../../lib/store/features/authSlice";
 import { FaUser, FaClipboardList, FaBox, FaTruck, FaBars } from 'react-icons/fa';
 import PatientList from '../../components/PatientList';
 import FoodChartList from '../../components/FoodChartList';
 import PantryStaffList from '../../components/PantryChartList';
 import MealDeliveryList from '../../components/MealDeliveryList';
+import { logout } from "../../lib/store/features/authSlice";
+import axios from 'axios';
+import { toast } from "react-hot-toast";
 
 const DashboardPage: React.FC = () => {
     const router = useRouter();
+    const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('patients');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -22,6 +28,21 @@ const DashboardPage: React.FC = () => {
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
+
+    const handleLogout = async () => {
+        // Clear the localStorage and dispatch the logout action
+        try {
+            const response = await axios.get("/api/auth/logout");
+            localStorage.removeItem("authToken");
+            dispatch(logout()); // Dispatch logout action to clear the user state
+            toast.success("Logout Successful");
+            router.push("/login"); // Redirect to login page after logout
+        } catch (error) {
+            console.error("Error during token verification:", error);
+        }
+
+    };
+
 
     return (
         <div className="min-h-screen flex relative">
@@ -57,7 +78,7 @@ const DashboardPage: React.FC = () => {
                     </li>
                 </ul>
                 <button
-                    onClick={() => router.push('/admin/login')}
+                    onClick={handleLogout}
                     className="mt-6 bg-red-600 py-2 px-4 rounded-lg w-full"
                 >
                     Logout

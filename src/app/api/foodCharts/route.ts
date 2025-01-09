@@ -21,11 +21,12 @@ export async function POST(req: Request) {
         morningMeal,
         eveningMeal,
         nightMeal,
-        instructions
+        instructions,
+        ingredients
     } = await req.json();
 
     // Validate required fields
-    if (!patientId || !morningMeal || !eveningMeal || !nightMeal || !instructions) {
+    if (!patientId || !morningMeal || !eveningMeal || !nightMeal || !instructions || !ingredients) {
         return NextResponse.json(
             { message: 'Missing required fields' },
             { status: 400 }
@@ -40,7 +41,8 @@ export async function POST(req: Request) {
             morningMeal,
             eveningMeal,
             nightMeal,
-            instructions
+            instructions,
+            ingredients
         });
 
         await newFoodChart.save(); // Save the new patient to the database
@@ -56,16 +58,17 @@ export async function POST(req: Request) {
 // PUT: Update an existing patient
 export async function PUT(req: Request) {
     const {
-        id,
+        _id,
         patientId,
         morningMeal,
         eveningMeal,
         nightMeal,
-        instructions
+        instructions,
+        ingredients
     } = await req.json();  // Parse the incoming JSON request body
 
     // Validate required fields
-    if (!patientId || !morningMeal || !eveningMeal || !nightMeal || !instructions) {
+    if (!patientId || !morningMeal || !eveningMeal || !nightMeal || !instructions || !ingredients) {
         return NextResponse.json(
             { message: 'patientId, morningMeal, eveningMeal, nightMeal and instructions are required' },
             { status: 400 }
@@ -74,7 +77,7 @@ export async function PUT(req: Request) {
 
     try {
         await connectDb();
-        const foodCharts = await FoodChart.findById(id);  // Find patient by ID
+        const foodCharts = await FoodChart.findById(_id);  // Find patient by ID
 
         if (!foodCharts) {
             return NextResponse.json({ message: 'delivery not found' }, { status: 404 });
@@ -86,6 +89,7 @@ export async function PUT(req: Request) {
         foodCharts.eveningMeal = eveningMeal;
         foodCharts.nightMeal = nightMeal;
         foodCharts.instructions = instructions;
+        foodCharts.ingredients = ingredients;
 
         // Save updated foodCharts
         await foodCharts.save();

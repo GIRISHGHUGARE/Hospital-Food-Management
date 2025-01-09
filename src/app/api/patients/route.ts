@@ -68,7 +68,7 @@ export async function POST(req: Request) {
 // PUT: Update an existing patient
 export async function PUT(req: Request) {
     const {
-        id,
+        _id,
         name,
         diseases,
         allergies,
@@ -92,7 +92,7 @@ export async function PUT(req: Request) {
 
     try {
         await connectDb();
-        const patient = await Patient.findById(id);  // Find patient by ID
+        const patient = await Patient.findById(_id);  // Find patient by ID
 
         if (!patient) {
             return NextResponse.json({ message: 'Patient not found' }, { status: 404 });

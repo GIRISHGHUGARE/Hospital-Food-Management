@@ -3,19 +3,28 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
-import { FaEdit, FaTrashAlt, FaPlusCircle } from 'react-icons/fa'; // Importing icons
+import { FaEdit, FaTrashAlt, FaPlusCircle, FaBed, FaHospitalAlt, } from 'react-icons/fa'; // Importing icons
 import AddPatientForm from '@/app/patients/page';
 
 interface Patient {
     _id: string;
     name: string;
+    diseases?: string;
+    allergies?: string;
     roomNumber: string;
     bedNumber: string;
+    floorNumber: string;
+    age: string;
+    gender: string;
+    contactInfo: string;
+    emergencyContact: string;
+    otherDetails?: string;
 }
 
 const PatientList: React.FC = () => {
     const [patients, setPatients] = useState<Patient[]>([]);
     const [isFormOpen, setIsFormOpen] = useState(false);
+    const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -32,16 +41,24 @@ const PatientList: React.FC = () => {
 
     const deletePatient = async (id: string) => {
         try {
-            await axios.delete(`/api/patients/${id}`);
-            setPatients(patients.filter(patient => patient._id !== id));
+            // Send the ID in the request body as per your backend structure
+            await axios.delete('/api/patients', { data: { id } });  // Use `data` to send body in DELETE request
+            setPatients(patients.filter(patient => patient._id !== id));  // Remove the patient from the list
             toast.success("Patient deleted.");
         } catch (error) {
             toast.error("Failed to delete patient.");
         }
     };
 
+
+    const openFormForEdit = (patient: Patient) => {
+        setSelectedPatient(patient);
+        setIsFormOpen(true);
+    };
+
     const closeForm = () => {
-        setIsFormOpen(false); // Close the form
+        setSelectedPatient(null);
+        setIsFormOpen(false);
     };
 
     return (
@@ -60,24 +77,18 @@ const PatientList: React.FC = () => {
                     onClick={closeForm}
                 >
                     <div
-                        className="form-container relative bg-white p-8 rounded-lg shadow-md w-96 max-w-full max-h-[90vh] overflow-y-auto"
+                        className="form-container relative bg-white p-8 rounded-lg shadow-md w-[800px] max-w-full max-h-[90vh] overflow-y-auto"
                         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the form
                     >
-                        <button
-                            onClick={closeForm}
-                            className="absolute top-2 right-2 text-gray-600"
-                        >
-                            X
-                        </button>
-
-                        {/* Add New Patient Form */}
-                        <AddPatientForm closeForm={closeForm} />
+                        {/* Add or Edit Patient Form */}
+                        <AddPatientForm closeForm={closeForm} patient={selectedPatient} />
                     </div>
                 </div>
-
             )}
 
             {/* Patient List */}
+
+
             <ul className="mt-4">
                 {patients.map(patient => (
                     <li
@@ -86,12 +97,19 @@ const PatientList: React.FC = () => {
                     >
                         <div>
                             <h3 className="font-semibold">{patient.name}</h3>
-                            <p>Room: {patient.roomNumber}</p>
-                            <p>Bed: {patient.bedNumber}</p>
+                            <div className="flex items-center space-x-2">
+                                <FaHospitalAlt className="text-gray-600" /> {/* Room Icon */}
+                                <p>Room: {patient.roomNumber}</p>
+                            </div>
+                            <div className="flex items-center space-x-2 mt-2">
+                                <FaBed className="text-gray-600" /> {/* Bed Icon */}
+                                <p>Bed: {patient.bedNumber}</p>
+                            </div>
                         </div>
+
                         <div className="flex space-x-4">
                             <button
-                                onClick={() => router.push(`/admin/patient/edit/${patient._id}`)}
+                                onClick={() => openFormForEdit(patient)} // Open form for editing
                                 className="text-blue-500 flex items-center space-x-2"
                             >
                                 <FaEdit /> <span>Edit</span>
@@ -106,8 +124,10 @@ const PatientList: React.FC = () => {
                     </li>
                 ))}
             </ul>
+
         </div>
     );
 };
 
 export default PatientList;
+

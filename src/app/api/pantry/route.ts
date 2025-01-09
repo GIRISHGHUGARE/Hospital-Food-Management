@@ -52,7 +52,7 @@ export async function POST(req: Request) {
 // PUT: Update an existing patient
 export async function PUT(req: Request) {
     const {
-        id,
+        _id,
         staffName,
         contactInfo,
         location,
@@ -68,7 +68,7 @@ export async function PUT(req: Request) {
 
     try {
         await connectDb();
-        const pantry = await Pantry.findById(id);  // Find patient by ID
+        const pantry = await Pantry.findById(_id);  // Find patient by ID
 
         if (!pantry) {
             return NextResponse.json({ message: 'pantry not found' }, { status: 404 });
