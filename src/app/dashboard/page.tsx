@@ -1,13 +1,14 @@
-// src/app/home/page.tsx
 "use client"; // Ensure that this component is marked as a client component
 
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { selectToken, selectUser, selectLoading, selectError } from "../../lib/store/features/authSlice";
+import { selectToken, selectUser, login, setError, setLoading } from "../../lib/store/features/authSlice";
 import { useRouter } from "next/navigation"; // Use Next.js router instead of react-router-dom
 import { logout } from "../../lib/store/features/authSlice"; // Assuming logout action exists in your slice
 import Background from '../../assets/background.webp';
 import { toast } from "react-hot-toast";
+import axios from "axios";
+import Cookies from "js-cookie";  // Import js-cookie
 
 const page: React.FC = () => {
     const dispatch = useDispatch();
@@ -19,19 +20,47 @@ const page: React.FC = () => {
 
     // Access email from the user object
     const email = user?.email;
-
+    // Check authentication status
     useEffect(() => {
-        if (!token) {
-            router.push("/login");  // If no token, redirect to login page
-        }
-    }, [token, router]);
+        const checkAuth = async () => {
+            if (typeof window !== "undefined") {  // Ensure this only runs on the client
+                try {
+                    dispatch(setLoading(true));  // Start loading
 
-    const handleLogout = () => {
+                    // Make request to the backend (token will be sent automatically in cookies)
+                    const response = await axios.get("/api/auth/me");
+
+                    if (response.data.user) {
+                        console.log(response.data.token);
+                        dispatch(login({ token: response.data.token, user: response.data.user }));  // Store user data in Redux
+                    } else {
+                        dispatch(setError("Authentication failed"));
+                    }
+                } catch (error) {
+                    dispatch(setError("Token verification failed"));
+                    console.error("Error during token verification:", error);
+                } finally {
+                    dispatch(setLoading(false));  // Stop loading when done
+                }
+            }
+        };
+
+        checkAuth();
+    }, [dispatch]);
+
+
+    const handleLogout = async () => {
         // Clear the localStorage and dispatch the logout action
-        localStorage.removeItem("authToken");
-        dispatch(logout()); // Dispatch logout action to clear the user state
-        toast.success("Logout Successful");
-        router.push("/login"); // Redirect to login page after logout
+        try {
+            const response = await axios.get("/api/auth/logout");
+            localStorage.removeItem("authToken");
+            dispatch(logout()); // Dispatch logout action to clear the user state
+            toast.success("Logout Successful");
+            router.push("/login"); // Redirect to login page after logout
+        } catch (error) {
+            console.error("Error during token verification:", error);
+        }
+
     };
 
     return (

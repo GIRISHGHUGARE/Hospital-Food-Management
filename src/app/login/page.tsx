@@ -11,7 +11,6 @@ import { RootState } from '../../lib/store/store'; // Adjust this import based o
 // Assuming User type looks something like this
 export interface User {
     _id: string | null;
-    username: string | null;
     email: string | null;
     role: string | null;
 }

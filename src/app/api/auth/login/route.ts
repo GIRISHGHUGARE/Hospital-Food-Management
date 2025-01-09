@@ -6,45 +6,59 @@ import jwt from 'jsonwebtoken';
 import connectDb from '../../../../config/db';
 
 export async function POST(req: Request) {
-    await connectDb();
+    try {
+        await connectDb();
 
-    const { email, password } = await req.json();
+        const { email, password } = await req.json();
 
-    // Validate required fields
-    if (!email || !password) {
+        // Validate required fields
+        if (!email || !password) {
+            return NextResponse.json(
+                { message: 'Email, password are required' },
+                { status: 400 }
+            );
+        }
+
+        // Check if user already exists
+        const user = await User.findOne({ email });
+
+        // Hash password
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return NextResponse.json({ message: 'Invalid username or password' }, { status: 400 });
+        }
+
+        // Generate JWT token for the  user
+        const token = jwt.sign(
+            { userId: user._id, role: user.role },
+            process.env.JWT_SECRET as string,
+            { expiresIn: '1d' } // Token expires in 1 day
+        );
+
+
+        const response = NextResponse.json(
+            {
+                message: 'User login successfully!',
+                token,
+                user: {
+                    id: user._id,
+                    email: user.email,
+                    role: user.role
+                }
+            },
+            { status: 201 }
+        );
+
+        response.cookies.set("token", token, {
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000,
+        });
+        return response;
+    } catch (error) {
         return NextResponse.json(
-            { message: 'Email, password are required' },
-            { status: 400 }
+            { error },
+            { status: 500 }
         );
     }
-
-    // Check if user already exists
-    const user = await User.findOne({ email });
-
-    // Hash password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-        return NextResponse.json({ message: 'Invalid username or password' }, { status: 400 });
-    }
-
-    // Generate JWT token for the  user
-    const token = jwt.sign(
-        { userId: user._id, role: user.role },
-        process.env.JWT_SECRET as string,
-        { expiresIn: '1d' } // Token expires in 1 day
-    );
-
-    return NextResponse.json(
-        {
-            message: 'User login successfully!',
-            token,
-            user: {
-                id: user._id,
-                email: user.email,
-                role: user.role
-            }
-        },
-        { status: 201 }
-    );
 }
 

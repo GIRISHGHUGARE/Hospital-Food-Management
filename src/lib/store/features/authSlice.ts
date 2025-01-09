@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../store';
+import Cookies from "js-cookie";  // Import js-cookie
 
 // Define a type for the user and state
 export interface User {
@@ -24,7 +25,7 @@ const initialState: AuthState = {
     },
     loading: false,
     error: null,
-    token: localStorage.getItem('authToken') || null, // Check localStorage for token on initial load
+    token: null, // Start with null as default
 };
 
 // Create the auth slice
@@ -39,7 +40,9 @@ export const authSlice = createSlice({
             state.loading = false;
             state.error = null;
             // You could save the token to localStorage here (if needed)
-            localStorage.setItem('authToken', token);
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('authToken', token);
+            }
         },
         logout: (state) => {
             // Reset the user object and token on logout
@@ -52,7 +55,9 @@ export const authSlice = createSlice({
             state.loading = false;
             state.error = null;
             // Clear token from localStorage on logout
-            localStorage.removeItem('authToken');
+            if (typeof window !== 'undefined') {
+                localStorage.removeItem('authToken');
+            }
         },
         setLoading: (state, action: PayloadAction<boolean>) => {
             state.loading = action.payload;
