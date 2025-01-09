@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     } = await req.json();
 
     // Validate required fields
-    if (!patientId || !mealBox || !deliveryTime || delivered || deliveryNotes) {
+    if (!patientId || !mealBox || !deliveryTime || !deliveryNotes) {
         return NextResponse.json(
             { message: 'Missing required fields' },
             { status: 400 }
@@ -65,7 +65,7 @@ export async function PUT(req: Request) {
     } = await req.json();  // Parse the incoming JSON request body
 
     // Validate required fields
-    if (!patientId || !mealBox || !deliveryTime || delivered || deliveryNotes) {
+    if (!patientId || !mealBox || !deliveryTime || !deliveryNotes) {
         return NextResponse.json(
             { message: 'patientId, mealBox, deliveryTime, delivered and deliveryNotes are required' },
             { status: 400 }

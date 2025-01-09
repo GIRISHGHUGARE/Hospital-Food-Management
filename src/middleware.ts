@@ -21,6 +21,7 @@ export const config = {
         "/",
         "/login",
         "/signup",
-        "/dashboard"
+        "/dashboard",
+        "/patients"
     ],
 }
