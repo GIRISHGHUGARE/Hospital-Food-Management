@@ -3,13 +3,19 @@ import connectDb from "../../../config/db";
 import Pantry from "../../../models/Pantry";
 import Delivery from "../../../models/Delivery";
 
+interface AssignedTask {
+    _id: string;
+    preparationStatus?: string; // Adjust based on your schema
+    [key: string]: unknown; // For additional unknown properties
+}
+
 // GET: Fetch all pantry staff
-export async function GET(req: Request) {
+export async function GET() {
     try {
         await connectDb();
         const pantry = await Pantry.find().populate("assignedTasks"); // Populate tasks
         return NextResponse.json(pantry, { status: 200 });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ message: "Failed to fetch pantry staff" }, { status: 500 });
     }
 }
@@ -110,11 +116,12 @@ export async function DELETE(req: Request) {
 
         await Pantry.findByIdAndDelete(id);
         return NextResponse.json({ message: "Pantry staff deleted successfully" }, { status: 200 });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ message: "Failed to delete pantry staff" }, { status: 500 });
     }
 }
 
+// PATCH: Update the status of a specific task
 export async function PATCH(req: Request) {
     const { taskId, newStatus } = await req.json();
 
@@ -138,8 +145,9 @@ export async function PATCH(req: Request) {
         }
 
         const updatedTask = pantry.assignedTasks.find(
-            (task: any) => task._id.toString() === taskId
+            (task: AssignedTask) => task._id === taskId
         );
+
         return NextResponse.json(updatedTask, { status: 200 });
     } catch (error) {
         return NextResponse.json(

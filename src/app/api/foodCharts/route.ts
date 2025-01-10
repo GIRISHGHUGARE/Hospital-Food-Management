@@ -1,15 +1,14 @@
-// src/app/api/patients.ts
 import { NextResponse } from 'next/server';
 import connectDb from '../../../config/db';
 import FoodChart from '../../../models/FoodChart';
 
 // GET: Fetch all patients
-export async function GET(req: Request) {
+export async function GET() {
     try {
         await connectDb();
         const foodCharts = await FoodChart.find();
         return NextResponse.json(foodCharts, { status: 200 });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ message: 'Failed to fetch foodCharts' }, { status: 500 });
     }
 }
@@ -48,13 +47,14 @@ export async function POST(req: Request) {
         await newFoodChart.save(); // Save the new patient to the database
 
         return NextResponse.json(newFoodChart, { status: 201 }); // Return created patient
-    } catch (error) {
+    } catch {
         return NextResponse.json(
-            { message: 'Failed to create foodCharts', error: error },
+            { message: 'Failed to create foodCharts' },
             { status: 500 }
         );
     }
 }
+
 // PUT: Update an existing patient
 export async function PUT(req: Request) {
     const {
@@ -70,7 +70,7 @@ export async function PUT(req: Request) {
     // Validate required fields
     if (!patientId || !morningMeal || !eveningMeal || !nightMeal || !instructions || !ingredients) {
         return NextResponse.json(
-            { message: 'patientId, morningMeal, eveningMeal, nightMeal and instructions are required' },
+            { message: 'patientId, morningMeal, eveningMeal, nightMeal, and instructions are required' },
             { status: 400 }
         );
     }
@@ -80,7 +80,7 @@ export async function PUT(req: Request) {
         const foodCharts = await FoodChart.findById(_id);  // Find patient by ID
 
         if (!foodCharts) {
-            return NextResponse.json({ message: 'delivery not found' }, { status: 404 });
+            return NextResponse.json({ message: 'FoodChart not found' }, { status: 404 });
         }
 
         // Update patient details
@@ -95,7 +95,7 @@ export async function PUT(req: Request) {
         await foodCharts.save();
 
         return NextResponse.json(foodCharts, { status: 200 });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ message: 'Failed to update foodCharts' }, { status: 500 });
     }
 }
@@ -114,14 +114,14 @@ export async function DELETE(req: Request) {
         const foodCharts = await FoodChart.findById(id);
 
         if (!foodCharts) {
-            return NextResponse.json({ message: 'foodCharts not found' }, { status: 404 });
+            return NextResponse.json({ message: 'FoodChart not found' }, { status: 404 });
         }
 
         // Delete the delivery
         await FoodChart.findByIdAndDelete(id);
 
-        return NextResponse.json({ message: 'foodCharts deleted successfully' }, { status: 200 });
-    } catch (error) {
-        return NextResponse.json({ message: 'error to delete foodCharts' }, { status: 500 });
+        return NextResponse.json({ message: 'FoodChart deleted successfully' }, { status: 200 });
+    } catch {
+        return NextResponse.json({ message: 'Error deleting FoodChart' }, { status: 500 });
     }
 }

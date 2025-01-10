@@ -1,9 +1,9 @@
 "use client";
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import axios from 'axios';
-import { toast } from 'react-hot-toast';
-import { FaUser, FaPhoneAlt, FaLocationArrow } from 'react-icons/fa'; // Import necessary icons
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { toast } from "react-hot-toast";
+import { FaUser, FaPhoneAlt, FaLocationArrow } from "react-icons/fa"; // Import necessary icons
 
 interface AddPantryStaffFormProps {
     closeForm: () => void;
@@ -17,21 +17,24 @@ interface PantryStaff {
     location: string;
     assignedTasks: string[]; // Use string[] to store task IDs
     availability?: boolean;
-    role?: 'Preparation' | 'Inventory' | 'Delivery';
+    role?: "Preparation" | "Inventory" | "Delivery";
 }
 
+interface Delivery {
+    mealBox: string;
+}
 
 const AddPantryStaffForm: React.FC<AddPantryStaffFormProps> = ({ closeForm, staff }) => {
     const router = useRouter();
     const [availableTasks, setAvailableTasks] = useState<string[]>([]);
     const [formData, setFormData] = useState<PantryStaff>({
-        _id: '',
-        staffName: '',
-        contactInfo: '',
-        location: '',
+        _id: "",
+        staffName: "",
+        contactInfo: "",
+        location: "",
         assignedTasks: [],
         availability: true,
-        role: 'Preparation', // Default role (adjust as needed)
+        role: "Preparation", // Default role
     });
     const [loading, setLoading] = useState(false);
 
@@ -42,24 +45,23 @@ const AddPantryStaffForm: React.FC<AddPantryStaffFormProps> = ({ closeForm, staf
         }
     }, [staff]);
 
+    // Fetch available tasks
     useEffect(() => {
-        axios.get('/api/deliveries')
+        axios
+            .get("/api/deliveries")
             .then((response) => {
-                const deliveries = response.data; // Full response data
-                console.log('Deliveries:', deliveries); // Log to verify structure
-                // Extract mealBox values from each delivery
-                const mealBoxes = deliveries.map((delivery: any) => delivery.mealBox);
+                const deliveries: Delivery[] = response.data; // Use the Delivery type
+                console.log("Deliveries:", deliveries); // Log to verify structure
+                const mealBoxes = deliveries.map((delivery) => delivery.mealBox);
                 setAvailableTasks(mealBoxes);
             })
-            .catch((error) => console.error('Error fetching tasks:', error));
+            .catch((error) => console.error("Error fetching tasks:", error));
     }, []);
-
-
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
 
-        if (type === 'checkbox') {
+        if (type === "checkbox") {
             const isChecked = (e.target as HTMLInputElement).checked; // Narrow type to HTMLInputElement for checkboxes
             setFormData({
                 ...formData,
@@ -73,7 +75,6 @@ const AddPantryStaffForm: React.FC<AddPantryStaffFormProps> = ({ closeForm, staf
         }
     };
 
-
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -85,25 +86,24 @@ const AddPantryStaffForm: React.FC<AddPantryStaffFormProps> = ({ closeForm, staf
             if (staff) {
                 response = await axios.put(`/api/pantry`, payload);
             } else {
-                response = await axios.post('/api/pantry', payload);
+                response = await axios.post("/api/pantry", payload);
             }
 
             if (response.status === 200 || response.status === 201) {
-                toast.success(staff ? 'Pantry staff updated successfully' : 'Pantry staff added successfully');
+                toast.success(staff ? "Pantry staff updated successfully" : "Pantry staff added successfully");
                 closeForm();
-                router.push('/dashboard');
+                router.push("/dashboard");
             }
-        } catch (error) {
-            toast.error(staff ? 'Failed to update pantry staff' : 'Failed to add pantry staff');
+        } catch {
+            toast.error(staff ? "Failed to update pantry staff" : "Failed to add pantry staff");
         } finally {
             setLoading(false);
         }
     };
 
-
     return (
         <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg">
-            <h2 className="text-2xl font-semibold mb-6">{staff ? 'Edit Pantry Staff' : 'Add New Pantry Staff'}</h2>
+            <h2 className="text-2xl font-semibold mb-6">{staff ? "Edit Pantry Staff" : "Add New Pantry Staff"}</h2>
             <form onSubmit={handleSubmit}>
                 <div className="grid gap-4">
                     {/* Staff ID (non-editable) */}
@@ -159,6 +159,8 @@ const AddPantryStaffForm: React.FC<AddPantryStaffFormProps> = ({ closeForm, staf
                             className="border p-2 w-full rounded"
                         />
                     </div>
+
+                    {/* Availability Checkbox */}
                     <div className="flex items-center">
                         <label className="mr-2">Available:</label>
                         <input
@@ -169,6 +171,8 @@ const AddPantryStaffForm: React.FC<AddPantryStaffFormProps> = ({ closeForm, staf
                             className="rounded"
                         />
                     </div>
+
+                    {/* Role Dropdown */}
                     <div className="flex items-center">
                         <label className="mr-2">Role:</label>
                         <select
@@ -183,6 +187,8 @@ const AddPantryStaffForm: React.FC<AddPantryStaffFormProps> = ({ closeForm, staf
                             <option value="Delivery">Delivery</option>
                         </select>
                     </div>
+
+                    {/* Assign Tasks */}
                     <div className="flex items-center">
                         <label className="mr-2">Assign Tasks:</label>
                         <select
@@ -206,16 +212,15 @@ const AddPantryStaffForm: React.FC<AddPantryStaffFormProps> = ({ closeForm, staf
                                 </option>
                             ))}
                         </select>
-
                     </div>
 
                     {/* Submit Button */}
                     <button
                         type="submit"
-                        className={`bg-blue-600 text-white py-2 px-6 rounded-lg mt-4 ${loading ? 'opacity-50' : ''}`}
+                        className={`bg-blue-600 text-white py-2 px-6 rounded-lg mt-4 ${loading ? "opacity-50" : ""}`}
                         disabled={loading}
                     >
-                        {loading ? 'Saving...' : staff ? 'Save Changes' : 'Add Staff'}
+                        {loading ? "Saving..." : staff ? "Save Changes" : "Add Staff"}
                     </button>
                 </div>
             </form>

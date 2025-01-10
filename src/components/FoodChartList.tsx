@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { useRouter } from "next/navigation";
 import {
     FaEdit,
     FaTrashAlt,
@@ -10,7 +9,7 @@ import {
     FaUtensils,
     FaSun,
     FaMoon,
-    FaNotesMedical
+    FaNotesMedical,
 } from "react-icons/fa";
 import AddFoodChartForm from "../app/foodCharts/page"; // Importing the form component
 
@@ -32,23 +31,21 @@ interface Patient {
 
 const FoodChartList: React.FC = () => {
     const [foodCharts, setFoodCharts] = useState<FoodChart[]>([]);
-    const [patients, setPatients] = useState<Patient[]>([]); // Store patients list
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [selectedFoodChart, setSelectedFoodChart] = useState<FoodChart | null>(null);
-    const router = useRouter();
 
     // Fetch food chart list
     useEffect(() => {
         const fetchFoodCharts = async () => {
             try {
                 const foodChartRes = await axios.get("/api/foodCharts");
-                const patientRes = await axios.get("/api/patients"); // Fetch patients list
+                const patientRes = await axios.get("/api/patients");
 
-                const patientsData: Patient[] = patientRes.data;
-                const foodChartsData = foodChartRes.data;
+                const patientsData: Patient[] = patientRes.data; // Explicitly typed
+                const foodChartsData: FoodChart[] = foodChartRes.data;
 
                 // Match patientId to patientName
-                const updatedFoodCharts = foodChartsData.map((foodChart: FoodChart) => {
+                const updatedFoodCharts = foodChartsData.map((foodChart) => {
                     const patient = patientsData.find((p) => p._id === foodChart.patientId);
                     return {
                         ...foodChart,
@@ -57,8 +54,7 @@ const FoodChartList: React.FC = () => {
                 });
 
                 setFoodCharts(updatedFoodCharts);
-                setPatients(patientsData);
-            } catch (error) {
+            } catch {
                 toast.error("Failed to load food charts.");
             }
         };
@@ -72,7 +68,7 @@ const FoodChartList: React.FC = () => {
             await axios.delete("/api/foodcharts", { data: { id } });
             setFoodCharts(foodCharts.filter((foodChart) => foodChart._id !== id));
             toast.success("Food chart deleted.");
-        } catch (error) {
+        } catch {
             toast.error("Failed to delete food chart.");
         }
     };

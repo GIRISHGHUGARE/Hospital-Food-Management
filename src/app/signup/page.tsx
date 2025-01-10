@@ -22,7 +22,7 @@ export interface LoginResponseData {
     user: User;    // The user data
 }
 
-const page: React.FC = () => {
+const Page: React.FC = () => {
     const router = useRouter(); // For navigation in Next.js
     const dispatch = useDispatch();
 
@@ -32,7 +32,6 @@ const page: React.FC = () => {
 
     // Access loading and error states from Redux store with appropriate types
     const loading = useSelector((state: RootState) => state.auth.loading);
-    const error = useSelector((state: RootState) => state.auth.error);
 
     // Handle login submission
     const handleSubmit = async (): Promise<void> => {
@@ -52,9 +51,9 @@ const page: React.FC = () => {
 
             // Navigate to the home screen after successful login
             router.push('/dashboard'); // Assuming 'home' is the route
-        } catch (error: any) {
-            dispatch(setError(error.response?.data?.message || "SignUp failed"));
-            toast.error("SignUp failed! " + (error.response?.data?.message || ""));
+        } catch {
+            dispatch(setError("SignUp failed"));
+            toast.error("SignUp failed! ");
         } finally {
             dispatch(setLoading(false));
         }
@@ -138,4 +137,4 @@ const page: React.FC = () => {
     );
 };
 
-export default page;
+export default Page;

@@ -4,12 +4,12 @@ import connectDb from '../../../config/db';
 import Patient from '../../../models/Patient';
 
 // GET: Fetch all patients
-export async function GET(req: Request) {
+export async function GET() {
     try {
         await connectDb();
         const patients = await Patient.find();  // Fetch all patients from the database
         return NextResponse.json(patients, { status: 200 });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ message: 'Failed to fetch patients' }, { status: 500 });
     }
 }
@@ -115,7 +115,7 @@ export async function PUT(req: Request) {
         await patient.save();
 
         return NextResponse.json(patient, { status: 200 });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ message: 'Failed to update patient' }, { status: 500 });
     }
 }
@@ -141,7 +141,7 @@ export async function DELETE(req: Request) {
         await Patient.findByIdAndDelete(id);
 
         return NextResponse.json({ message: 'Patient deleted successfully' }, { status: 200 });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ message: 'Failed to delete patient' }, { status: 500 });
     }
 }

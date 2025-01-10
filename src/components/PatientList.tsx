@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import { useRouter } from 'next/navigation';
 import { FaEdit, FaTrashAlt, FaPlusCircle, FaBed, FaHospitalAlt, } from 'react-icons/fa'; // Importing icons
 import AddPatientForm from '@/app/patients/page';
 
@@ -25,14 +24,13 @@ const PatientList: React.FC = () => {
     const [patients, setPatients] = useState<Patient[]>([]);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-    const router = useRouter();
 
     useEffect(() => {
         const fetchPatients = async () => {
             try {
                 const res = await axios.get('/api/patients');
                 setPatients(res.data);
-            } catch (error) {
+            } catch {
                 toast.error("Failed to load patients.");
             }
         };
@@ -45,7 +43,7 @@ const PatientList: React.FC = () => {
             await axios.delete('/api/patients', { data: { id } });  // Use `data` to send body in DELETE request
             setPatients(patients.filter(patient => patient._id !== id));  // Remove the patient from the list
             toast.success("Patient deleted.");
-        } catch (error) {
+        } catch {
             toast.error("Failed to delete patient.");
         }
     };

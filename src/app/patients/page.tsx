@@ -79,7 +79,7 @@ const AddPatientForm: React.FC<AddPatientFormProps> = ({ closeForm, patient }) =
                 closeForm(); // Close the form after successful submission
                 router.push('/dashboard'); // Redirect to dashboard after success
             }
-        } catch (error) {
+        } catch {
             toast.error(patient ? 'Failed to update patient' : 'Failed to add patient');
         } finally {
             setLoading(false);

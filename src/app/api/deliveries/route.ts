@@ -3,12 +3,12 @@ import connectDb from "../../../config/db";
 import Delivery from "../../../models/Delivery";
 
 // GET: Fetch all deliveries
-export async function GET(req: Request) {
+export async function GET() {
     try {
         await connectDb();
         const deliveries = await Delivery.find().populate("patientId"); // Populate patient info
         return NextResponse.json(deliveries, { status: 200 });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ message: "Failed to fetch deliveries" }, { status: 500 });
     }
 }
@@ -34,8 +34,8 @@ export async function POST(req: Request) {
 
         await newDelivery.save();
         return NextResponse.json(newDelivery, { status: 201 });
-    } catch (error) {
-        return NextResponse.json({ message: "Failed to create delivery", error }, { status: 500 });
+    } catch {
+        return NextResponse.json({ message: "Failed to create delivery" }, { status: 500 });
     }
 }
 
@@ -63,7 +63,7 @@ export async function PUT(req: Request) {
 
         await delivery.save();
         return NextResponse.json(delivery, { status: 200 });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ message: "Failed to update delivery" }, { status: 500 });
     }
 }
@@ -86,7 +86,7 @@ export async function DELETE(req: Request) {
 
         await Delivery.findByIdAndDelete(id);
         return NextResponse.json({ message: "Delivery deleted successfully" }, { status: 200 });
-    } catch (error) {
+    } catch {
         return NextResponse.json({ message: "Failed to delete delivery" }, { status: 500 });
     }
 }

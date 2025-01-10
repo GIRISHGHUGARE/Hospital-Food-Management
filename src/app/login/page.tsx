@@ -1,13 +1,13 @@
 "use client";
-import React, { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { login, setLoading, setError } from '../../lib/store/features/authSlice';
-import axios from 'axios';
-import { useRouter } from 'next/navigation';  // Using next/navigation instead of 'react-router-dom'
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { login, setLoading, setError } from "../../lib/store/features/authSlice";
+import axios from "axios";
+import { useRouter } from "next/navigation"; // Using next/navigation instead of 'react-router-dom'
 import { toast } from "react-hot-toast";
-import Background from '../../assets/background.webp';
-import { RootState } from '../../lib/store/store'; // Adjust this import based on your store setup
-import Header from '@/components/Header';
+import Background from "../../assets/background.webp";
+import { RootState } from "../../lib/store/store"; // Adjust this import based on your store setup
+import Header from "@/components/Header";
 
 // Assuming User type looks something like this
 export interface User {
@@ -22,7 +22,7 @@ export interface LoginResponseData {
     user: User;    // The user data
 }
 
-const page: React.FC = () => {
+const Page: React.FC = () => {
     const router = useRouter(); // For navigation in Next.js
     const dispatch = useDispatch();
 
@@ -31,7 +31,6 @@ const page: React.FC = () => {
 
     // Access loading and error states from Redux store with appropriate types
     const loading = useSelector((state: RootState) => state.auth.loading);
-    const error = useSelector((state: RootState) => state.auth.error);
 
     const handleSubmit = async (): Promise<void> => {
         dispatch(setLoading(true)); // Set loading state
@@ -63,20 +62,23 @@ const page: React.FC = () => {
             } else {
                 toast.error("Unauthorized role!");
             }
-        } catch (error: any) {
-            dispatch(setError(error.response?.data?.message || "Login failed"));
-            toast.error("Login failed! " + (error.response?.data?.message || ""));
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                dispatch(setError(error.response?.data?.message || "Login failed"));
+                toast.error("Login failed! " + (error.response?.data?.message || ""));
+            } else {
+                dispatch(setError("An unexpected error occurred"));
+                toast.error("An unexpected error occurred");
+            }
         } finally {
             dispatch(setLoading(false));
         }
     };
 
-
     return (
         <div
             className="min-h-screen bg-cover bg-center"
             style={{ backgroundImage: `url(${Background.src})` }}
-
         >
             <Header />
             <div className="flex items-center justify-center min-h-screen bg-black bg-opacity-50">
@@ -115,7 +117,7 @@ const page: React.FC = () => {
                         <div className="mt-6">
                             <button
                                 onClick={handleSubmit}
-                                className={`w-full py-2 px-4 bg-blue-600 font-bold text-white rounded-lg ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                className={`w-full py-2 px-4 bg-blue-600 font-bold text-white rounded-lg ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                                 disabled={loading}
                             >
                                 {loading ? "Logging in..." : "Login"}
@@ -125,10 +127,10 @@ const page: React.FC = () => {
                         {/* Register Link */}
                         <div className="mt-4 text-center">
                             <p className="text-gray-600">
-                                Don't have an account?{' '}
+                                Don&apos;t have an account?{" "}
                                 <span
                                     className="text-red-500 cursor-pointer font-bold"
-                                    onClick={() => router.push('/signup')}  // Navigate to the SignUp page
+                                    onClick={() => router.push("/signup")} // Navigate to the SignUp page
                                 >
                                     Register Now
                                 </span>
@@ -141,4 +143,4 @@ const page: React.FC = () => {
     );
 };
 
-export default page;
+export default Page;

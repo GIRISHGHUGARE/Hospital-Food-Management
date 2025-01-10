@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { toast } from "react-hot-toast";
 import { FaCheckCircle, FaHourglassHalf, FaClipboardList } from "react-icons/fa";
 
@@ -10,6 +10,11 @@ interface Task {
     assignedTo: string; // Name of the assigned staff member
 }
 
+interface Staff {
+    staffName: string; // Name of the staff member
+    assignedTasks: Task[]; // Tasks assigned to the staff
+}
+
 const TaskList: React.FC = () => {
     const [tasks, setTasks] = useState<Task[]>([]);
 
@@ -17,10 +22,10 @@ const TaskList: React.FC = () => {
     useEffect(() => {
         const fetchTasks = async () => {
             try {
-                const response = await axios.get("/api/pantry"); // Correct API endpoint
+                const response = await axios.get<Staff[]>("/api/pantry"); // Correct API endpoint
                 // Flatten the response to extract tasks and their assigned staff
-                const pantryTasks = response.data.flatMap((staff: any) =>
-                    staff.assignedTasks.map((task: any) => ({
+                const pantryTasks = response.data.flatMap((staff) =>
+                    staff.assignedTasks.map((task) => ({
                         _id: task._id,
                         mealBox: task.mealBox,
                         preparationStatus: task.preparationStatus,
@@ -28,9 +33,10 @@ const TaskList: React.FC = () => {
                     }))
                 );
                 setTasks(pantryTasks);
-            } catch (error: any) {
+            } catch (error) {
+                const axiosError = error as AxiosError<{ message: string }>;
                 const errorMessage =
-                    error.response?.data?.message || "Failed to fetch tasks.";
+                    axiosError.response?.data?.message || "Failed to fetch tasks.";
                 toast.error(errorMessage);
             }
         };
@@ -41,8 +47,8 @@ const TaskList: React.FC = () => {
     // Update the status of a task
     const updateTaskStatus = async (taskId: string, newStatus: string) => {
         try {
-            const response = await axios.patch(`/api/pantry`, { taskId, newStatus });
-            const updatedTask: Task = response.data;
+            const response = await axios.patch<Task>(`/api/pantry`, { taskId, newStatus });
+            const updatedTask = response.data;
 
             setTasks((prevTasks) =>
                 prevTasks.map((task) =>
@@ -53,9 +59,10 @@ const TaskList: React.FC = () => {
             );
 
             toast.success("Task status updated.");
-        } catch (error: any) {
+        } catch (error) {
+            const axiosError = error as AxiosError<{ message: string }>;
             const errorMessage =
-                error.response?.data?.message || "Failed to update task status.";
+                axiosError.response?.data?.message || "Failed to update task status.";
             toast.error(errorMessage);
         }
     };

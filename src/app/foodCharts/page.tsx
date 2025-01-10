@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import { FaEdit, FaPlusCircle } from 'react-icons/fa'; // Icons for UI
 
 interface AddFoodChartFormProps {
     closeForm: () => void;
@@ -43,7 +42,7 @@ const AddFoodChartForm: React.FC<AddFoodChartFormProps> = ({ closeForm, foodChar
             try {
                 const res = await axios.get('/api/patients');
                 setPatients(res.data);
-            } catch (error) {
+            } catch {
                 toast.error("Failed to load patients.");
             }
         };
@@ -119,7 +118,7 @@ const AddFoodChartForm: React.FC<AddFoodChartFormProps> = ({ closeForm, foodChar
                 toast.success(foodChart ? 'Food chart updated successfully' : 'Food chart added successfully');
                 closeForm(); // Close the form after successful submission
             }
-        } catch (error) {
+        } catch {
             toast.error(foodChart ? 'Failed to update food chart' : 'Failed to add food chart');
         } finally {
             setLoading(false);

@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { useRouter } from "next/navigation";
 import { FaCheckCircle, FaTimesCircle, FaUtensils, FaBed, FaClock, FaStickyNote } from "react-icons/fa";
 
 interface Delivery {
@@ -26,8 +25,6 @@ interface Patient {
 
 const MealDeliveryList: React.FC = () => {
     const [deliveries, setDeliveries] = useState<Delivery[]>([]);
-    const [patients, setPatients] = useState<Patient[]>([]); // Store patients list
-    const router = useRouter();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -52,8 +49,7 @@ const MealDeliveryList: React.FC = () => {
                 });
 
                 setDeliveries(updatedDeliveries);
-                setPatients(patientsData);
-            } catch (error) {
+            } catch {
                 toast.error("Failed to load deliveries or patients.");
             }
         };
@@ -67,7 +63,7 @@ const MealDeliveryList: React.FC = () => {
                 delivery._id === id ? { ...delivery, delivered: status } : delivery
             ));
             toast.success("Delivery status updated.");
-        } catch (error) {
+        } catch {
             toast.error("Failed to update delivery status.");
         }
     };

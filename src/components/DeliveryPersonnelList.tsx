@@ -10,6 +10,13 @@ interface Personnel {
     assignedTasks: string[];
 }
 
+interface ApiResponse {
+    _id: string;
+    staffName: string;
+    contactInfo: string;
+    assignedTasks?: string[];
+}
+
 const DeliveryPersonnelList: React.FC = () => {
     const [personnel, setPersonnel] = useState<Personnel[]>([]);
     const [newPersonnel, setNewPersonnel] = useState({ name: "", contact: "" });
@@ -18,16 +25,16 @@ const DeliveryPersonnelList: React.FC = () => {
     useEffect(() => {
         const fetchPersonnel = async () => {
             try {
-                const response = await axios.get("/api/pantry");
+                const response = await axios.get<ApiResponse[]>("/api/pantry");
                 setPersonnel(
-                    response.data.map((item: any) => ({
+                    response.data.map((item) => ({
                         _id: item._id,
                         name: item.staffName,
                         contact: item.contactInfo,
                         assignedTasks: item.assignedTasks || [],
                     }))
                 );
-            } catch (error) {
+            } catch {
                 toast.error("Failed to fetch pantry staff.");
             }
         };
@@ -43,7 +50,7 @@ const DeliveryPersonnelList: React.FC = () => {
         }
 
         try {
-            const response = await axios.post("/api/pantry", {
+            const response = await axios.post<ApiResponse>("/api/pantry", {
                 staffName: newPersonnel.name,
                 contactInfo: newPersonnel.contact,
                 location: "Default Location", // Replace with actual input if needed
@@ -61,7 +68,7 @@ const DeliveryPersonnelList: React.FC = () => {
             ]);
             setNewPersonnel({ name: "", contact: "" });
             toast.success("Pantry staff added.");
-        } catch (error) {
+        } catch {
             toast.error("Failed to add pantry staff.");
         }
     };
@@ -72,7 +79,7 @@ const DeliveryPersonnelList: React.FC = () => {
             await axios.delete("/api/pantry", { data: { id } });
             setPersonnel(personnel.filter((p) => p._id !== id));
             toast.success("Pantry staff removed.");
-        } catch (error) {
+        } catch {
             toast.error("Failed to remove pantry staff.");
         }
     };

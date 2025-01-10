@@ -1,8 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useDispatch, useSelector } from "react-redux";
-import { selectToken, selectUser, login, setError, setLoading } from "../../lib/store/features/authSlice";
+import { useDispatch } from "react-redux";
 import { FaUser, FaClipboardList, FaBox, FaTruck, FaBars } from 'react-icons/fa';
 import PatientList from '../../components/PatientList';
 import FoodChartList from '../../components/FoodChartList';
@@ -33,7 +32,7 @@ const DashboardPage: React.FC = () => {
     const handleLogout = async () => {
         // Clear the localStorage and dispatch the logout action
         try {
-            const response = await axios.get("/api/auth/logout");
+            await axios.get("/api/auth/logout");
             localStorage.removeItem("authToken");
             dispatch(logout()); // Dispatch logout action to clear the user state
             toast.success("Logout Successful");

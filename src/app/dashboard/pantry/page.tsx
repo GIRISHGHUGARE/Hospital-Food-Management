@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { logout } from "@/lib/store/features/authSlice";
 
-const page: React.FC = () => {
+const Page: React.FC = () => {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState("tasks");
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -26,7 +26,7 @@ const page: React.FC = () => {
     const handleLogout = async () => {
         // Clear the localStorage and dispatch the logout action
         try {
-            const response = await axios.get("/api/auth/logout");
+            await axios.get("/api/auth/logout");
             localStorage.removeItem("authToken");
             dispatch(logout()); // Dispatch logout action to clear the user state
             toast.success("Logout Successful");
@@ -101,4 +101,4 @@ const page: React.FC = () => {
     );
 };
 
-export default page;
+export default Page;

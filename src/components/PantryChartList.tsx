@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { useRouter } from "next/navigation";
 import {
     FaEdit,
     FaTrashAlt,
@@ -36,7 +35,7 @@ const PantryStaffList: React.FC = () => {
     const [selectedStaff, setSelectedStaff] = useState<PantryStaff | null>(null);
     const [selectedTasks, setSelectedTasks] = useState<Task[]>([]); // For task assignment
     const [assigningTask, setAssigningTask] = useState<string | null>(null); // Track staff being assigned a task
-    const router = useRouter();
+
 
     // Fetch pantry staff list
     useEffect(() => {
@@ -44,7 +43,7 @@ const PantryStaffList: React.FC = () => {
             try {
                 const res = await axios.get("/api/pantry");
                 setStaff(res.data);
-            } catch (error) {
+            } catch {
                 toast.error("Failed to load pantry staff.");
             }
         };
@@ -57,7 +56,7 @@ const PantryStaffList: React.FC = () => {
             await axios.delete("/api/pantry", { data: { id } });
             setStaff(staff.filter((staffMember) => staffMember._id !== id));
             toast.success("Pantry staff deleted.");
-        } catch (error) {
+        } catch {
             toast.error("Failed to delete pantry staff.");
         }
     };
@@ -87,7 +86,7 @@ const PantryStaffList: React.FC = () => {
 
             // Assuming both are arrays
             setSelectedTasks([...deliveries, ...foodCharts]);
-        } catch (error) {
+        } catch {
             toast.error("Failed to load tasks or food charts.");
         }
     };
