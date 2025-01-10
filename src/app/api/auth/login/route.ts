@@ -1,57 +1,73 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import User from "../../../../models/User";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import connectDb from "../../../../config/db";
+// src/app/api/auth.ts
+import { NextResponse } from 'next/server';
+import { NextApiRequest, NextApiResponse } from "next";
+import User from '../../../../models/User';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import connectDb from '../../../../config/db';
 import { cors } from "../../../../lib/initMiddleware";
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    await connectDb();
-    await cors(req, res);
-
-    if (req.method !== "POST") {
-        res.setHeader("Allow", ["POST"]);
-        return res.status(405).end(`Method ${req.method} Not Allowed`);
-    }
-
+export async function POST(req: Request, request: NextApiRequest, respon: NextApiResponse) {
     try {
-        const { email, password } = req.body;
+        await connectDb();
+        await cors(request, respon);
 
+        const { email, password } = await req.json();
+
+        // Validate required fields
         if (!email || !password) {
-            return res.status(400).json({ message: "Email, password are required" });
+            return NextResponse.json(
+                { message: 'Email, password are required' },
+                { status: 400 }
+            );
         }
 
+        // Check if user already exists
         const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ message: "Invalid username or password" });
-        }
 
+        // Hash password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(400).json({ message: "Invalid username or password" });
+            return NextResponse.json({ message: 'Invalid username or password' }, { status: 400 });
         }
 
+        // Generate JWT token for the  user
         const token = jwt.sign(
             { userId: user._id, role: user.role },
             process.env.JWT_SECRET as string,
-            { expiresIn: "1d" }
+            { expiresIn: '1d' } // Token expires in 1 day
         );
 
-        res.setHeader("Set-Cookie", [
-            `token=${token}; HttpOnly; Path=/; Max-Age=86400`,
-            `role=${user.role}; HttpOnly; Secure; SameSite=Strict; Path=/;`,
-        ]);
 
-        res.status(201).json({
-            message: "User login successfully!",
-            token,
-            user: {
-                id: user._id,
-                email: user.email,
-                role: user.role,
+        const response = NextResponse.json(
+            {
+                message: 'User login successfully!',
+                token,
+                user: {
+                    id: user._id,
+                    email: user.email,
+                    role: user.role
+                }
             },
+            { status: 201 }
+        );
+
+        response.cookies.set("token", token, {
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000,
         });
+        response.cookies.set("role", user.role, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+        });
+
+        return response;
     } catch (error) {
-        res.status(500).json({ error });
+        return NextResponse.json(
+            { error },
+            { status: 500 }
+        );
     }
 }
+
