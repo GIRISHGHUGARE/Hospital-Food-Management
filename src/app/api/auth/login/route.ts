@@ -7,12 +7,13 @@ import jwt from 'jsonwebtoken';
 import connectDb from '../../../../config/db';
 import { cors } from "../../../../lib/initMiddleware";
 
-export async function POST(req: Request, request: NextApiRequest, respon: NextApiResponse) {
+export async function POST(req: Request) {
     try {
         console.log("Connecting to DB...");
         await connectDb();
         console.log("Applying CORS...");
-        await cors(request, respon);
+        const respon = NextResponse.next();
+        await cors(req, respon);
 
         console.log("Parsing request body...");
         const { email, password } = await req.json();

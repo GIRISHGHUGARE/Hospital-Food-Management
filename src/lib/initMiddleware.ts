@@ -1,11 +1,10 @@
+// src/lib/cors.ts
 import Cors from "cors";
-import { NextApiRequest, NextApiResponse } from "next";
 
-// Helper method to initialize middleware
 export function initMiddleware(
-    middleware: (req: NextApiRequest, res: NextApiResponse, next: (err?: unknown) => void) => void
+    middleware: (req: any, res: any, next: (err?: any) => void) => void
 ) {
-    return (req: NextApiRequest, res: NextApiResponse): Promise<void> =>
+    return (req: any, res: any): Promise<void> =>
         new Promise((resolve, reject) => {
             middleware(req, res, (result: unknown) => {
                 if (result instanceof Error) {
@@ -17,10 +16,11 @@ export function initMiddleware(
 }
 
 // Initialize CORS middleware
-export const cors = initMiddleware(
-    Cors({
-        origin: ["http://localhost:3000", "https://hospital-food-management-kjlo.onrender.com"],
-        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    })
-);
+const corsMiddleware = Cors({
+    origin: ["http://localhost:3000", "https://hospital-food-management-kjlo.onrender.com"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+});
+
+export const cors = initMiddleware(corsMiddleware);
+
 console.log("CORS Middleware Initialized");
