@@ -42,7 +42,7 @@ const Page: React.FC = () => {
                 return;
             }
 
-            const response = await axios.post<LoginResponseData>(`${DOMAIN}api/auth/login`, {
+            const response = await axios.post<LoginResponseData>(`${DOMAIN}/api/auth/login`, {
                 email: email,
                 password: password,
             });
