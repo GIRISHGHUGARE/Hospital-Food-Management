@@ -1,6 +1,5 @@
 // src/app/api/auth.ts
 import { NextResponse } from 'next/server';
-import { NextApiRequest, NextApiResponse } from "next";
 import User from '../../../../models/User';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
