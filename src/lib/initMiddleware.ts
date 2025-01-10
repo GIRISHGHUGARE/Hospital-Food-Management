@@ -19,7 +19,7 @@ export function initMiddleware(
 // Initialize CORS middleware
 export const cors = initMiddleware(
     Cors({
-        origin: ["http://localhost:3000", "https://hospital-food-management.com"],
+        origin: ["http://localhost:3000", "https://hospital-food-management-kjlo.onrender.com"],
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     })
 );
