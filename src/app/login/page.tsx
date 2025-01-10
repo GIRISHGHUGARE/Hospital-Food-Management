@@ -25,7 +25,7 @@ export interface LoginResponseData {
 const Page: React.FC = () => {
     const router = useRouter(); // For navigation in Next.js
     const dispatch = useDispatch();
-    const DOMAIN = process.env.DOMAIN || "http://localhost:3000";
+    const DOMAIN = process.env.DOMAIN;
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
 
