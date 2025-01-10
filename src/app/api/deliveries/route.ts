@@ -1,35 +1,24 @@
-// src/app/api/patients.ts
-import { NextResponse } from 'next/server';
-import connectDb from '../../../config/db';
-import Delivery from '../../../models/Delivery';
+import { NextResponse } from "next/server";
+import connectDb from "../../../config/db";
+import Delivery from "../../../models/Delivery";
 
-// GET: Fetch all patients
+// GET: Fetch all deliveries
 export async function GET(req: Request) {
     try {
         await connectDb();
-        const delivery = await Delivery.find();  // Fetch all patients from the database
-        return NextResponse.json(delivery, { status: 200 });
+        const deliveries = await Delivery.find().populate("patientId"); // Populate patient info
+        return NextResponse.json(deliveries, { status: 200 });
     } catch (error) {
-        return NextResponse.json({ message: 'Failed to fetch delivery' }, { status: 500 });
+        return NextResponse.json({ message: "Failed to fetch deliveries" }, { status: 500 });
     }
 }
 
-// POST: Create a new patient
+// POST: Create a new delivery
 export async function POST(req: Request) {
-    const {
-        patientId,
-        mealBox,
-        deliveryTime,
-        delivered,
-        deliveryNotes
-    } = await req.json();
+    const { patientId, mealBox, deliveryTime, delivered = false, deliveryNotes } = await req.json();
 
-    // Validate required fields
     if (!patientId || !mealBox || !deliveryTime || !deliveryNotes) {
-        return NextResponse.json(
-            { message: 'Missing required fields' },
-            { status: 400 }
-        );
+        return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
     }
 
     try {
@@ -40,69 +29,22 @@ export async function POST(req: Request) {
             mealBox,
             deliveryTime,
             delivered,
-            deliveryNotes
+            deliveryNotes,
         });
 
-        await newDelivery.save(); // Save the new patient to the database
-
-        return NextResponse.json(newDelivery, { status: 201 }); // Return created patient
+        await newDelivery.save();
+        return NextResponse.json(newDelivery, { status: 201 });
     } catch (error) {
-        return NextResponse.json(
-            { message: 'Failed to create delivery', error: error },
-            { status: 500 }
-        );
+        return NextResponse.json({ message: "Failed to create delivery", error }, { status: 500 });
     }
 }
-// PUT: Update an existing patient
+
+// PUT: Update an existing delivery
 export async function PUT(req: Request) {
-    const {
-        id,
-        patientId,
-        mealBox,
-        deliveryTime,
-        delivered,
-        deliveryNotes
-    } = await req.json();  // Parse the incoming JSON request body
+    const { id, patientId, mealBox, deliveryTime, delivered, deliveryNotes } = await req.json();
 
-    // Validate required fields
     if (!patientId || !mealBox || !deliveryTime || !deliveryNotes) {
-        return NextResponse.json(
-            { message: 'patientId, mealBox, deliveryTime, delivered and deliveryNotes are required' },
-            { status: 400 }
-        );
-    }
-
-    try {
-        await connectDb();
-        const delivery = await Delivery.findById(id);  // Find patient by ID
-
-        if (!delivery) {
-            return NextResponse.json({ message: 'delivery not found' }, { status: 404 });
-        }
-
-        // Update patient details
-        delivery.patientId = patientId;
-        delivery.mealBox = mealBox;
-        delivery.deliveryTime = deliveryTime;
-        delivery.delivered = delivered;
-        delivery.deliveryNotes = deliveryNotes;
-
-        // Save updated patient
-        await delivery.save();
-
-        return NextResponse.json(delivery, { status: 200 });
-    } catch (error) {
-        return NextResponse.json({ message: 'Failed to update delivery' }, { status: 500 });
-    }
-}
-
-// DELETE: Delete a patient by ID
-export async function DELETE(req: Request) {
-    const { id } = await req.json();  // Parse the incoming JSON request body
-
-    // Validate required fields
-    if (!id) {
-        return NextResponse.json({ message: 'ID is required' }, { status: 400 });
+        return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
     }
 
     try {
@@ -110,14 +52,41 @@ export async function DELETE(req: Request) {
         const delivery = await Delivery.findById(id);
 
         if (!delivery) {
-            return NextResponse.json({ message: 'delivery not found' }, { status: 404 });
+            return NextResponse.json({ message: "Delivery not found" }, { status: 404 });
         }
 
-        // Delete the delivery
-        await Delivery.findByIdAndDelete(id);
+        delivery.patientId = patientId;
+        delivery.mealBox = mealBox;
+        delivery.deliveryTime = deliveryTime;
+        delivery.delivered = delivered;
+        delivery.deliveryNotes = deliveryNotes;
 
-        return NextResponse.json({ message: 'delivery deleted successfully' }, { status: 200 });
+        await delivery.save();
+        return NextResponse.json(delivery, { status: 200 });
     } catch (error) {
-        return NextResponse.json({ message: 'error to delete delivery' }, { status: 500 });
+        return NextResponse.json({ message: "Failed to update delivery" }, { status: 500 });
+    }
+}
+
+// DELETE: Delete a delivery by ID
+export async function DELETE(req: Request) {
+    const { id } = await req.json();
+
+    if (!id) {
+        return NextResponse.json({ message: "ID is required" }, { status: 400 });
+    }
+
+    try {
+        await connectDb();
+        const delivery = await Delivery.findById(id);
+
+        if (!delivery) {
+            return NextResponse.json({ message: "Delivery not found" }, { status: 404 });
+        }
+
+        await Delivery.findByIdAndDelete(id);
+        return NextResponse.json({ message: "Delivery deleted successfully" }, { status: 200 });
+    } catch (error) {
+        return NextResponse.json({ message: "Failed to delete delivery" }, { status: 500 });
     }
 }

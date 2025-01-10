@@ -1,27 +1,61 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-// This function can be marked `async` if using `await` inside
+// Middleware function to handle authentication and authorization
 export function middleware(request: NextRequest) {
     const path = request.nextUrl.pathname;
-    const isPublicPath = path === "/login" || path === "/signup" || path === "/";
+
+    // Define public paths
+    const isPublicPath = ["/login", "/signup", "/", "/about", "/services", "/contact"].includes(path);
+
+    // Extract token and role from cookies
     const token = request.cookies.get("token")?.value || "";
+    const role = request.cookies.get("role")?.value || "";
+
+    // Handle authenticated users accessing public paths
     if (isPublicPath && token) {
-        return NextResponse.redirect(new URL('/dashboard', request.url))
-    }
-    if (!isPublicPath && !token) {
-        return NextResponse.redirect(new URL('/login', request.url))
+        if (role === "admin") {
+            return NextResponse.redirect(new URL('/dashboard', request.url));
+        } else if (role === "pantry") {
+            return NextResponse.redirect(new URL('/dashboard/pantry', request.url));
+        } else if (role === "delivery") {
+            return NextResponse.redirect(new URL('/dashboard/delivery', request.url));
+        } else {
+            return NextResponse.redirect(new URL('/login', request.url));
+        }
     }
 
+    // Handle unauthenticated access to private paths
+    if (!isPublicPath && !token) {
+        return NextResponse.redirect(new URL('/login', request.url));
+    }
+
+    // Role-based access control for private paths
+    if (path.startsWith("/dashboard") && role !== "admin" && path === "/dashboard") {
+        return NextResponse.redirect(new URL('/login', request.url));
+    }
+    if (path.startsWith("/dashboard/pantry") && role !== "pantry") {
+        return NextResponse.redirect(new URL('/login', request.url));
+    }
+    if (path.startsWith("/dashboard/delivery") && role !== "delivery") {
+        return NextResponse.redirect(new URL('/login', request.url));
+    }
+
+    // Allow access if all checks pass
+    return NextResponse.next();
 }
 
-// See "Matching Paths" below to learn more
+// Middleware configuration
 export const config = {
     matcher: [
         "/",
         "/login",
         "/signup",
         "/dashboard",
-        "/patients"
+        "/dashboard/pantry",
+        "/dashboard/delivery",
+        "/about",
+        "/services",
+        "/contact",
     ],
-}
+};

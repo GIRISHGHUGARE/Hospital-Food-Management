@@ -14,6 +14,10 @@ export async function GET(req: Request) {
             httpOnly: true,
             expires: new Date(0),
         });
+        response.cookies.set("role", "", {
+            httpOnly: true,
+            expires: new Date(0),
+        });
         return response;
     } catch (error) {
         return NextResponse.json(

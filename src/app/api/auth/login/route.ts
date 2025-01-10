@@ -53,6 +53,12 @@ export async function POST(req: Request) {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000,
         });
+        response.cookies.set("role", user.role, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+        });
+
         return response;
     } catch (error) {
         return NextResponse.json(

@@ -15,15 +15,23 @@ interface PantryStaff {
     staffName: string;
     contactInfo: string;
     location: string;
+    assignedTasks: string[]; // Use string[] to store task IDs
+    availability?: boolean;
+    role?: 'Preparation' | 'Inventory' | 'Delivery';
 }
+
 
 const AddPantryStaffForm: React.FC<AddPantryStaffFormProps> = ({ closeForm, staff }) => {
     const router = useRouter();
+    const [availableTasks, setAvailableTasks] = useState<string[]>([]);
     const [formData, setFormData] = useState<PantryStaff>({
         _id: '',
         staffName: '',
         contactInfo: '',
-        location: ''
+        location: '',
+        assignedTasks: [],
+        availability: true,
+        role: 'Preparation', // Default role (adjust as needed)
     });
     const [loading, setLoading] = useState(false);
 
@@ -34,14 +42,37 @@ const AddPantryStaffForm: React.FC<AddPantryStaffFormProps> = ({ closeForm, staf
         }
     }, [staff]);
 
-    // Handle form field changes
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        });
+    useEffect(() => {
+        axios.get('/api/deliveries')
+            .then((response) => {
+                const deliveries = response.data; // Full response data
+                console.log('Deliveries:', deliveries); // Log to verify structure
+                // Extract mealBox values from each delivery
+                const mealBoxes = deliveries.map((delivery: any) => delivery.mealBox);
+                setAvailableTasks(mealBoxes);
+            })
+            .catch((error) => console.error('Error fetching tasks:', error));
+    }, []);
+
+
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value, type } = e.target;
+
+        if (type === 'checkbox') {
+            const isChecked = (e.target as HTMLInputElement).checked; // Narrow type to HTMLInputElement for checkboxes
+            setFormData({
+                ...formData,
+                [name]: isChecked,
+            });
+        } else {
+            setFormData({
+                ...formData,
+                [name]: value,
+            });
+        }
     };
+
 
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
@@ -49,19 +80,18 @@ const AddPantryStaffForm: React.FC<AddPantryStaffFormProps> = ({ closeForm, staf
         setLoading(true);
 
         try {
+            const payload = { ...formData }; // Includes assignedTasks
             let response;
             if (staff) {
-                // Editing an existing staff (PUT request)
-                response = await axios.put(`/api/pantry`, formData);
+                response = await axios.put(`/api/pantry`, payload);
             } else {
-                // Adding a new staff (POST request)
-                response = await axios.post('/api/pantry', formData);
+                response = await axios.post('/api/pantry', payload);
             }
 
             if (response.status === 200 || response.status === 201) {
                 toast.success(staff ? 'Pantry staff updated successfully' : 'Pantry staff added successfully');
-                closeForm(); // Close the form after successful submission
-                router.push('/dashboard'); // Redirect to pantry staff list after success
+                closeForm();
+                router.push('/dashboard');
             }
         } catch (error) {
             toast.error(staff ? 'Failed to update pantry staff' : 'Failed to add pantry staff');
@@ -69,6 +99,7 @@ const AddPantryStaffForm: React.FC<AddPantryStaffFormProps> = ({ closeForm, staf
             setLoading(false);
         }
     };
+
 
     return (
         <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg">
@@ -127,6 +158,55 @@ const AddPantryStaffForm: React.FC<AddPantryStaffFormProps> = ({ closeForm, staf
                             required
                             className="border p-2 w-full rounded"
                         />
+                    </div>
+                    <div className="flex items-center">
+                        <label className="mr-2">Available:</label>
+                        <input
+                            type="checkbox"
+                            name="availability"
+                            checked={formData.availability}
+                            onChange={(e) => setFormData({ ...formData, availability: e.target.checked })}
+                            className="rounded"
+                        />
+                    </div>
+                    <div className="flex items-center">
+                        <label className="mr-2">Role:</label>
+                        <select
+                            name="role"
+                            value={formData.role}
+                            onChange={(e) => handleChange(e as React.ChangeEvent<HTMLSelectElement>)}
+                            required
+                            className="border p-2 w-full rounded"
+                        >
+                            <option value="Preparation">Preparation</option>
+                            <option value="Inventory">Inventory</option>
+                            <option value="Delivery">Delivery</option>
+                        </select>
+                    </div>
+                    <div className="flex items-center">
+                        <label className="mr-2">Assign Tasks:</label>
+                        <select
+                            name="assignedTasks"
+                            value={formData.assignedTasks}
+                            onChange={(e) =>
+                                setFormData({
+                                    ...formData,
+                                    assignedTasks: Array.from(
+                                        e.target.selectedOptions,
+                                        (option) => option.value
+                                    ),
+                                })
+                            }
+                            multiple
+                            className="border p-2 w-full rounded"
+                        >
+                            {availableTasks.map((task) => (
+                                <option key={task} value={task}>
+                                    {task}
+                                </option>
+                            ))}
+                        </select>
+
                     </div>
 
                     {/* Submit Button */}

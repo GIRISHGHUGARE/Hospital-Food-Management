@@ -1,9 +1,9 @@
 "use client";
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { toast } from 'react-hot-toast';
-import { useRouter } from 'next/navigation';
-import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa'; // Importing icons
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { FaCheckCircle, FaTimesCircle, FaUtensils, FaBed, FaClock, FaStickyNote } from "react-icons/fa";
 
 interface Delivery {
     _id: string;
@@ -33,11 +33,11 @@ const MealDeliveryList: React.FC = () => {
         const fetchData = async () => {
             try {
                 // Fetch deliveries
-                const deliveryRes = await axios.get('/api/deliveries');
+                const deliveryRes = await axios.get("/api/deliveries");
                 const deliveriesData = deliveryRes.data;
 
                 // Fetch patients
-                const patientRes = await axios.get('/api/patients');
+                const patientRes = await axios.get("/api/patients");
                 const patientsData = patientRes.data;
 
                 // Map patient details to deliveries
@@ -45,9 +45,9 @@ const MealDeliveryList: React.FC = () => {
                     const patient = patientsData.find((p: Patient) => p._id === delivery.patientId);
                     return {
                         ...delivery,
-                        patientName: patient ? patient.name : 'Unknown Patient',
-                        bedNumber: patient ? patient.bedNumber : 'Unknown Bed',
-                        roomNumber: patient ? patient.roomNumber : 'Unknown Room',
+                        patientName: patient ? patient.name : "Unknown Patient",
+                        bedNumber: patient ? patient.bedNumber : "Unknown Bed",
+                        roomNumber: patient ? patient.roomNumber : "Unknown Room",
                     };
                 });
 
@@ -79,22 +79,42 @@ const MealDeliveryList: React.FC = () => {
                     <li key={delivery._id} className="flex justify-between items-center p-4 bg-white shadow-md mb-2 rounded-lg">
                         <div>
                             {/* Patient Details */}
-                            <h3 className="font-semibold">Meal Box: {delivery.mealBox}</h3>
-                            <p><strong>Patient Name:</strong> {delivery.patientName}</p>
-                            <p><strong>Bed:</strong> {delivery.bedNumber}</p>
-                            <p><strong>Room:</strong> {delivery.roomNumber}</p>
-                            <p><strong>Delivery Time:</strong> {new Date(delivery.deliveryTime).toLocaleString()}</p>
-                            <p><strong>Status:</strong> {delivery.delivered ? "Delivered" : "Pending"}</p>
-                            <p><strong>Notes:</strong> {delivery.deliveryNotes}</p>
+                            <h3 className="font-semibold flex items-center space-x-2">
+                                <FaUtensils className="text-gray-500" />
+                                <span>Meal Box: {delivery.mealBox}</span>
+                            </h3>
+                            <p className="flex items-center space-x-2">
+                                <FaBed className="text-gray-500" />
+                                <span><strong>Patient Name:</strong> {delivery.patientName}</span>
+                            </p>
+                            <p className="flex items-center space-x-2">
+                                <FaBed className="text-gray-500" />
+                                <span><strong>Bed:</strong> {delivery.bedNumber}</span>
+                            </p>
+                            <p className="flex items-center space-x-2">
+                                <FaBed className="text-gray-500" />
+                                <span><strong>Room:</strong> {delivery.roomNumber}</span>
+                            </p>
+                            <p className="flex items-center space-x-2">
+                                <FaClock className="text-gray-500" />
+                                <span><strong>Delivery Time:</strong> {new Date(delivery.deliveryTime).toLocaleString()}</span>
+                            </p>
+                            <p className="flex items-center space-x-2">
+                                <FaStickyNote className="text-gray-500" />
+                                <span><strong>Notes:</strong> {delivery.deliveryNotes}</span>
+                            </p>
+                            <p className={`font-bold ${delivery.delivered ? "text-green-500" : "text-red-500"}`}>
+                                <strong>Status:</strong> {delivery.delivered ? "Delivered" : "Pending"}
+                            </p>
                         </div>
                         <div className="flex space-x-4">
                             {/* Mark as Delivered or Undelivered */}
                             <button
                                 onClick={() => updateDeliveryStatus(delivery._id, !delivery.delivered)}
-                                className={`flex items-center space-x-2 ${delivery.delivered ? 'text-red-500' : 'text-green-500'}`}
+                                className={`flex items-center space-x-2 ${delivery.delivered ? "text-red-500" : "text-green-500"}`}
                             >
                                 {delivery.delivered ? <FaTimesCircle /> : <FaCheckCircle />}
-                                <span>Mark as {delivery.delivered ? 'Undelivered' : 'Delivered'}</span>
+                                <span>Mark as {delivery.delivered ? "Undelivered" : "Delivered"}</span>
                             </button>
                         </div>
                     </li>

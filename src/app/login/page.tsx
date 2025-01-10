@@ -33,7 +33,6 @@ const page: React.FC = () => {
     const loading = useSelector((state: RootState) => state.auth.loading);
     const error = useSelector((state: RootState) => state.auth.error);
 
-    // Handle login submission
     const handleSubmit = async (): Promise<void> => {
         dispatch(setLoading(true)); // Set loading state
         dispatch(setError(null)); // Clear previous errors
@@ -44,13 +43,26 @@ const page: React.FC = () => {
                 return;
             }
 
-            const response = await axios.post<LoginResponseData>("/api/auth/login", { email: email, password: password });
+            const response = await axios.post<LoginResponseData>("/api/auth/login", {
+                email: email,
+                password: password,
+            });
+
             const data: LoginResponseData = response.data;
             dispatch(login({ token: data.token, user: data.user }));
             toast.success("Login successful!");
 
-            // Navigate to the home screen after successful login
-            router.push('/dashboard'); // Assuming 'home' is the route
+            // Navigate based on user role
+            const role = data.user.role;
+            if (role === "admin") {
+                router.push("/dashboard");
+            } else if (role === "pantry") {
+                router.push("/dashboard/pantry");
+            } else if (role === "delivery") {
+                router.push("/dashboard/delivery");
+            } else {
+                toast.error("Unauthorized role!");
+            }
         } catch (error: any) {
             dispatch(setError(error.response?.data?.message || "Login failed"));
             toast.error("Login failed! " + (error.response?.data?.message || ""));
@@ -58,6 +70,7 @@ const page: React.FC = () => {
             dispatch(setLoading(false));
         }
     };
+
 
     return (
         <div

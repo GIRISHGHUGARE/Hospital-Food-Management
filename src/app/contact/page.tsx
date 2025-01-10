@@ -3,6 +3,12 @@ import React from "react";
 import Background from "../../assets/background.webp";
 import ContactUs from "@/components/ContactUs";
 import Footer from "@/components/Footer";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Contact Us - Healthy Bites",
+    description: "Be in touch.",
+};
 
 function Page() {
     return (

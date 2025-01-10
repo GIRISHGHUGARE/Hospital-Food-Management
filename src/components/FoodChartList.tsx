@@ -1,10 +1,18 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { toast } from 'react-hot-toast';
-import { useRouter } from 'next/navigation';
-import { FaEdit, FaTrashAlt, FaPlusCircle } from 'react-icons/fa';
-import AddFoodChartForm from '../app/foodCharts/page'; // Importing the form component
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import {
+    FaEdit,
+    FaTrashAlt,
+    FaPlusCircle,
+    FaUtensils,
+    FaSun,
+    FaMoon,
+    FaNotesMedical
+} from "react-icons/fa";
+import AddFoodChartForm from "../app/foodCharts/page"; // Importing the form component
 
 interface FoodChart {
     _id: string;
@@ -33,18 +41,18 @@ const FoodChartList: React.FC = () => {
     useEffect(() => {
         const fetchFoodCharts = async () => {
             try {
-                const foodChartRes = await axios.get('/api/foodCharts');
-                const patientRes = await axios.get('/api/patients'); // Fetch patients list
+                const foodChartRes = await axios.get("/api/foodCharts");
+                const patientRes = await axios.get("/api/patients"); // Fetch patients list
 
                 const patientsData: Patient[] = patientRes.data;
                 const foodChartsData = foodChartRes.data;
 
                 // Match patientId to patientName
                 const updatedFoodCharts = foodChartsData.map((foodChart: FoodChart) => {
-                    const patient = patientsData.find(p => p._id === foodChart.patientId);
+                    const patient = patientsData.find((p) => p._id === foodChart.patientId);
                     return {
                         ...foodChart,
-                        patientName: patient ? patient.name : 'Unknown Patient',
+                        patientName: patient ? patient.name : "Unknown Patient",
                     };
                 });
 
@@ -61,8 +69,8 @@ const FoodChartList: React.FC = () => {
     // Delete food chart
     const deleteFoodChart = async (id: string) => {
         try {
-            await axios.delete('/api/foodcharts', { data: { id } });
-            setFoodCharts(foodCharts.filter(foodChart => foodChart._id !== id));
+            await axios.delete("/api/foodcharts", { data: { id } });
+            setFoodCharts(foodCharts.filter((foodChart) => foodChart._id !== id));
             toast.success("Food chart deleted.");
         } catch (error) {
             toast.error("Failed to delete food chart.");
@@ -109,16 +117,29 @@ const FoodChartList: React.FC = () => {
 
             {/* Food Chart List */}
             <ul className="mt-4">
-                {foodCharts.map(foodChart => (
+                {foodCharts.map((foodChart) => (
                     <li
                         key={foodChart._id}
                         className="flex justify-between items-center p-4 bg-white shadow-md mb-2 rounded-lg"
                     >
                         <div>
-                            <p className="font-semibold">Patient: {foodChart.patientName}</p>
-                            <p>Morning Meal: {foodChart.morningMeal}</p>
-                            <p>Evening Meal: {foodChart.eveningMeal}</p>
-                            <p>Night Meal: {foodChart.nightMeal}</p>
+                            {/* Display Patient Info with Icons */}
+                            <p className="font-semibold flex items-center space-x-2">
+                                <FaNotesMedical className="text-gray-500" />
+                                <span>Patient: {foodChart.patientName}</span>
+                            </p>
+                            <p className="flex items-center space-x-2">
+                                <FaSun className="text-yellow-500" />
+                                <span>Morning Meal: {foodChart.morningMeal}</span>
+                            </p>
+                            <p className="flex items-center space-x-2">
+                                <FaUtensils className="text-orange-500" />
+                                <span>Evening Meal: {foodChart.eveningMeal}</span>
+                            </p>
+                            <p className="flex items-center space-x-2">
+                                <FaMoon className="text-purple-500" />
+                                <span>Night Meal: {foodChart.nightMeal}</span>
+                            </p>
                         </div>
 
                         <div className="flex space-x-4">

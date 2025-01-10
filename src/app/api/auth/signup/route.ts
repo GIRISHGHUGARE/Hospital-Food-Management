@@ -59,6 +59,11 @@ export async function POST(req: Request) {
         response.cookies.set("token", token, ({
             httpOnly: true
         }))
+        response.cookies.set("role", newUser.role, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+        });
         return response;
 
     } catch (error) {
