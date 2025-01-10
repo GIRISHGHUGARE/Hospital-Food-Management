@@ -25,7 +25,7 @@ export interface LoginResponseData {
 const Page: React.FC = () => {
     const router = useRouter(); // For navigation in Next.js
     const dispatch = useDispatch();
-
+    const DOMAIN = process.env.DOMAIN || "http://localhost:3000";
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
 
@@ -42,7 +42,7 @@ const Page: React.FC = () => {
                 return;
             }
 
-            const response = await axios.post<LoginResponseData>("/api/auth/login", {
+            const response = await axios.post<LoginResponseData>(`${DOMAIN}/api/auth/login`, {
                 email: email,
                 password: password,
             });
