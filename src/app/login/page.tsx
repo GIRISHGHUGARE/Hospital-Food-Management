@@ -41,7 +41,6 @@ const Page: React.FC = () => {
                 toast.error("Please fill in all fields.");
                 return;
             }
-            console.log("DOMAIN:", process.env.NEXT_PUBLIC_DOMAIN);
             const response = await axios.post<LoginResponseData>(`${NEXT_PUBLIC_DOMAIN}/api/auth/login`, {
                 email: email,
                 password: password,

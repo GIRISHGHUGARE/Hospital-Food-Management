@@ -9,12 +9,14 @@ import { cors } from "../../../../lib/initMiddleware";
 
 export async function POST(req: Request, request: NextApiRequest, respon: NextApiResponse) {
     try {
+        console.log("Connecting to DB...");
         await connectDb();
+        console.log("Applying CORS...");
         await cors(request, respon);
 
+        console.log("Parsing request body...");
         const { email, password } = await req.json();
 
-        // Validate required fields
         if (!email || !password) {
             return NextResponse.json(
                 { message: 'Email, password are required' },
@@ -22,22 +24,26 @@ export async function POST(req: Request, request: NextApiRequest, respon: NextAp
             );
         }
 
-        // Check if user already exists
+        console.log("Finding user...");
         const user = await User.findOne({ email });
-
-        // Hash password
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return NextResponse.json({ message: 'Invalid username or password' }, { status: 400 });
+        if (!user) {
+            console.log("User not found");
+            return NextResponse.json({ message: 'Invalid email or password' }, { status: 400 });
         }
 
-        // Generate JWT token for the  user
+        console.log("Comparing passwords...");
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            console.log("Password mismatch");
+            return NextResponse.json({ message: 'Invalid email or password' }, { status: 400 });
+        }
+
+        console.log("Generating JWT...");
         const token = jwt.sign(
             { userId: user._id, role: user.role },
             process.env.JWT_SECRET as string,
-            { expiresIn: '1d' } // Token expires in 1 day
+            { expiresIn: '1d' }
         );
-
 
         const response = NextResponse.json(
             {
@@ -46,8 +52,8 @@ export async function POST(req: Request, request: NextApiRequest, respon: NextAp
                 user: {
                     id: user._id,
                     email: user.email,
-                    role: user.role
-                }
+                    role: user.role,
+                },
             },
             { status: 201 }
         );
@@ -64,8 +70,9 @@ export async function POST(req: Request, request: NextApiRequest, respon: NextAp
 
         return response;
     } catch (error) {
+        console.error("Login API Error:", error);
         return NextResponse.json(
-            { error },
+            { message: "Internal Server Error", details: error },
             { status: 500 }
         );
     }

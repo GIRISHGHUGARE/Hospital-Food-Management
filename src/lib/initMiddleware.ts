@@ -23,3 +23,4 @@ export const cors = initMiddleware(
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     })
 );
+console.log("CORS Middleware Initialized");
