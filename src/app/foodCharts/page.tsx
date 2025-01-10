@@ -5,7 +5,7 @@ import { toast } from 'react-hot-toast';
 
 interface AddFoodChartFormProps {
     closeForm: () => void;
-    foodChart: FoodChart | null; // Optional food chart prop for editing
+    foodChart?: FoodChart | null;
 }
 
 interface FoodChart {
