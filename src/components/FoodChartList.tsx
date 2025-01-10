@@ -11,7 +11,8 @@ import {
     FaMoon,
     FaNotesMedical,
 } from "react-icons/fa";
-import AddFoodChartForm from "../app/foodCharts/page"; // Importing the form component
+import AddFoodChartForm from "@/components/AddFoodChartForm";
+// Importing the form component
 
 interface FoodChart {
     _id: string;

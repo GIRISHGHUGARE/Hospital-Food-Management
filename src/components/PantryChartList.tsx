@@ -11,7 +11,7 @@ import {
     FaLocationArrow,
     FaTasks,
 } from "react-icons/fa"; // Added Task Icon
-import AddPantryStaffForm from "../app/pantry/page"; // Importing the form component
+import AddPantryStaffForm from "@/components/AddPantryStaffForm"; // Importing the form component
 
 interface Task {
     _id: string;

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import { FaEdit, FaTrashAlt, FaPlusCircle, FaBed, FaHospitalAlt, } from 'react-icons/fa'; // Importing icons
-import AddPatientForm from '@/app/patients/page';
+import AddPatientForm from '@/components/AddPatientForm';
 
 interface Patient {
     _id: string;
