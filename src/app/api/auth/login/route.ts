@@ -4,10 +4,12 @@ import User from '../../../../models/User';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import connectDb from '../../../../config/db';
+import { cors } from "../../../../lib/initMiddleware";
 
-export async function POST(req: Request) {
+export async function POST(req: Request, res: Response) {
     try {
         await connectDb();
+        await cors(req, res);
 
         const { email, password } = await req.json();
 

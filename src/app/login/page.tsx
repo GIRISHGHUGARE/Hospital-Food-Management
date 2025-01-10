@@ -25,7 +25,7 @@ export interface LoginResponseData {
 const Page: React.FC = () => {
     const router = useRouter(); // For navigation in Next.js
     const dispatch = useDispatch();
-    const DOMAIN = process.env.DOMAIN;
+    const NEXT_PUBLIC_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
 
@@ -41,8 +41,8 @@ const Page: React.FC = () => {
                 toast.error("Please fill in all fields.");
                 return;
             }
-
-            const response = await axios.post<LoginResponseData>(`${DOMAIN}/api/auth/login`, {
+            console.log("DOMAIN:", process.env.NEXT_PUBLIC_DOMAIN);
+            const response = await axios.post<LoginResponseData>(`${NEXT_PUBLIC_DOMAIN}/api/auth/login`, {
                 email: email,
                 password: password,
             });
