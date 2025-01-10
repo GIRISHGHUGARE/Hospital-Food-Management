@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';  // Using next/navigation instead o
 import { toast } from "react-hot-toast";
 import Background from '../../assets/background.webp';
 import { RootState } from '../../lib/store/store'; // Adjust this import based on your store setup
+import Header from '@/components/Header';
 
 // Assuming User type looks something like this
 export interface User {
@@ -65,6 +66,7 @@ const page: React.FC = () => {
             style={{ backgroundImage: `url(${Background.src})` }}
 
         >
+            <Header />
             <div className="flex items-center justify-center min-h-screen bg-black bg-opacity-50">
                 {/* Login Card */}
                 <div className="relative bg-white rounded-xl shadow-lg w-full max-w-md p-8">
