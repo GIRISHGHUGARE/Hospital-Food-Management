@@ -1,15 +1,17 @@
-// lib/initMiddleware.ts
 import Cors from "cors";
+import { NextApiRequest, NextApiResponse } from "next";
 
 // Helper method to initialize middleware
-export function initMiddleware(middleware: any) {
-    return (req: any, res: any) =>
+export function initMiddleware(
+    middleware: (req: NextApiRequest, res: NextApiResponse, next: (err?: unknown) => void) => void
+) {
+    return (req: NextApiRequest, res: NextApiResponse): Promise<void> =>
         new Promise((resolve, reject) => {
-            middleware(req, res, (result: any) => {
+            middleware(req, res, (result: unknown) => {
                 if (result instanceof Error) {
                     return reject(result);
                 }
-                return resolve(result);
+                return resolve();
             });
         });
 }
