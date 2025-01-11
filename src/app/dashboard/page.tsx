@@ -15,7 +15,7 @@ import { toast } from "react-hot-toast";
 const DashboardPage: React.FC = () => {
     const router = useRouter();
     const dispatch = useDispatch();
-    const DOMAIN = process.env.DOMAIN;
+    const NEXT_PUBLIC_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
     const [activeTab, setActiveTab] = useState('patients');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -33,7 +33,7 @@ const DashboardPage: React.FC = () => {
     const handleLogout = async () => {
         // Clear the localStorage and dispatch the logout action
         try {
-            await axios.get(`${DOMAIN}/api/auth/logout`);
+            await axios.get(`${NEXT_PUBLIC_DOMAIN}/api/auth/logout`);
             localStorage.removeItem("authToken");
             dispatch(logout()); // Dispatch logout action to clear the user state
             toast.success("Logout Successful");

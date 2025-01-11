@@ -13,7 +13,7 @@ import { logout } from "@/lib/store/features/authSlice";
 const Page: React.FC = () => {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState("tasks");
-    const DOMAIN = process.env.DOMAIN;
+    const NEXT_PUBLIC_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const dispatch = useDispatch();
     const handleTabChange = (tab: string) => {
@@ -27,7 +27,7 @@ const Page: React.FC = () => {
     const handleLogout = async () => {
         // Clear the localStorage and dispatch the logout action
         try {
-            await axios.get(`${DOMAIN}/api/auth/logout`);
+            await axios.get(`${NEXT_PUBLIC_DOMAIN}/api/auth/logout`);
             localStorage.removeItem("authToken");
             dispatch(logout()); // Dispatch logout action to clear the user state
             toast.success("Logout Successful");

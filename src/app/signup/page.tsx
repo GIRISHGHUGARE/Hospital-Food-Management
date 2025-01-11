@@ -25,7 +25,7 @@ export interface LoginResponseData {
 const Page: React.FC = () => {
     const router = useRouter(); // For navigation in Next.js
     const dispatch = useDispatch();
-    const DOMAIN = process.env.DOMAIN || "http://localhost:3000";
+    const NEXT_PUBLIC_DOMAIN = process.env.NEXT_PUBLIC_DOMAIN;
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [role, setRole] = useState<string>("");
@@ -44,7 +44,7 @@ const Page: React.FC = () => {
                 return;
             }
 
-            const response = await axios.post<LoginResponseData>(`${DOMAIN}/api/auth/signup`, { email: email, password: password, role: role });
+            const response = await axios.post<LoginResponseData>(`${NEXT_PUBLIC_DOMAIN}/api/auth/signup`, { email: email, password: password, role: role });
             const data: LoginResponseData = response.data;
             dispatch(login({ token: data.token, user: data.user }));
             toast.success("SignUp successful!");

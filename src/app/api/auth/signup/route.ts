@@ -1,14 +1,16 @@
 // src/app/api/auth.ts
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import User from '../../../../models/User';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import connectDb from '../../../../config/db';
+import { cors } from '../../../../lib/initMiddleware';
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
         await connectDb();
-
+        const res = NextResponse.next(); // Creating a response object for CORS to work
+        await cors(req, res);
         const { email, password, role } = await req.json();
 
         // Validate required fields
