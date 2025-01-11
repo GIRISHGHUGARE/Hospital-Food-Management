@@ -1,27 +1,22 @@
-// src/lib/cors.ts
-import Cors from "cors";
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextRequest, NextResponse } from 'next/server';
 
-export function initMiddleware(
-    middleware: (req: NextApiRequest, res: NextApiResponse, next: (err?: unknown) => void) => void
-) {
-    return (req: NextApiRequest, res: NextApiResponse): Promise<void> =>
-        new Promise((resolve, reject) => {
-            middleware(req, res, (result: unknown) => {
-                if (result instanceof Error) {
-                    return reject(result);
-                }
-                return resolve();
-            });
-        });
+export async function cors(req: NextRequest, res: NextResponse) {
+    const allowedOrigins = ['http://localhost:3000', 'https://hospital-food-management-kjlo.onrender.com']; // Add your allowed origins here
+
+    const origin = req.headers.get('origin');
+
+    if (allowedOrigins.includes(origin || '')) {
+        res.headers.set('Access-Control-Allow-Origin', origin || '*');
+        res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.headers.set('Access-Control-Allow-Credentials', 'true');
+    }
+
+    // Handle preflight OPTIONS request
+    if (req.method === 'OPTIONS') {
+        // Return 200 with no content for preflight request
+        return NextResponse.json({}, { status: 200 });
+    }
+
+    return res;
 }
-
-// Initialize CORS middleware
-const corsMiddleware = Cors({
-    origin: ["http://localhost:3000", "https://hospital-food-management-kjlo.onrender.com"],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-});
-
-export const cors = initMiddleware(corsMiddleware);
-
-console.log("CORS Middleware Initialized");
