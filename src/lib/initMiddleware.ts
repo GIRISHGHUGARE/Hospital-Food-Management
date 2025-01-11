@@ -1,8 +1,9 @@
 // src/lib/cors.ts
 import Cors from "cors";
+import { NextApiRequest, NextApiResponse } from "next";
 
 export function initMiddleware(
-    middleware: (req: any, res: any, next: (err?: any) => void) => void
+    middleware: (req: NextApiRequest, res: NextApiResponse, next: (err?: any) => void) => void
 ) {
     return (req: any, res: any): Promise<void> =>
         new Promise((resolve, reject) => {
