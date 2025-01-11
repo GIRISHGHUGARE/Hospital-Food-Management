@@ -3,9 +3,9 @@ import Cors from "cors";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export function initMiddleware(
-    middleware: (req: NextApiRequest, res: NextApiResponse, next: (err?: any) => void) => void
+    middleware: (req: NextApiRequest, res: NextApiResponse, next: (err?: unknown) => void) => void
 ) {
-    return (req: any, res: any): Promise<void> =>
+    return (req: NextApiRequest, res: NextApiResponse): Promise<void> =>
         new Promise((resolve, reject) => {
             middleware(req, res, (result: unknown) => {
                 if (result instanceof Error) {

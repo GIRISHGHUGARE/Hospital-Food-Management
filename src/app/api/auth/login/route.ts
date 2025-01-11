@@ -45,7 +45,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             // Setting cookies in response
             res.setHeader('Set-Cookie', [
                 `token=${token}; HttpOnly; Max-Age=86400; Path=/; SameSite=Strict`,
-                `role=${user.role}; HttpOnly; Secure=${process.env.NODE_ENV === "production"}; SameSite=Strict`
+                `role=${user.role}; HttpOnly; SameSite=Strict`
             ]);
 
             // Sending success response
