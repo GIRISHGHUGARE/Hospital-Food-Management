@@ -1,5 +1,8 @@
 # Hospital Food Management System
 
+## Screenshots
+Link :- https://drive.google.com/drive/folders/12_xs8YGJjPsZa0lYcss1Kwcw4lvJuooe?usp=drive_link
+
 ## Overview
 
 This project is a **Hospital Food Management System** that enables the management of patient food requirements, pantry staff tasks, and meal deliveries. The system includes functionalities for hospital food managers, inner pantry staff, and delivery personnel. It also provides a dashboard for easy tracking of patient information, food/diet charts, pantry performance, and meal delivery statuses.
